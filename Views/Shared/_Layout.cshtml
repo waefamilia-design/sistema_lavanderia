@@ -1,0 +1,322 @@
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var usuarioLogin = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioLogin");
+    var usuarioNome = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioNome");
+    var usuarioPerfil = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioPerfil");
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Lavanderia Clean T-Shirt</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SistemaLavanderia.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Welcome">
+                    🧺 Clean T-Shirt
+                </a>
+
+                <div class="d-flex align-items-center ms-auto me-3 d-lg-none">
+                    <button class="theme-toggle me-2" onclick="toggleTheme()" title="Alternar Tema">
+                        <i class="bi bi-moon-stars-fill" id="themeIconMobile"></i>
+                    </button>
+                    <div class="d-flex gap-1">
+                        <a href="#" class="lang-btn" onclick="translatePage('pt')">PT</a>
+                        <a href="#" class="lang-btn" onclick="translatePage('en')">EN</a>
+                        <a href="#" class="lang-btn" onclick="translatePage('es')">ES</a>
+                    </div>
+                </div>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto align-items-lg-center d-none d-lg-flex">
+                        <li class="nav-item">
+                            <button class="theme-toggle" onclick="toggleTheme()" title="Alternar Tema">
+                                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                            </button>
+                        </li>
+                        <li class="nav-item ms-2 d-flex gap-1">
+                            <a href="javascript:void(0)" class="lang-btn" onclick="translatePage('pt')">PT</a>
+                            <a href="javascript:void(0)" class="lang-btn" onclick="translatePage('en')">EN</a>
+                            <a href="javascript:void(0)" class="lang-btn" onclick="translatePage('es')">ES</a>
+                        </li>
+                    </ul>
+
+                    @if (!string.IsNullOrEmpty(usuarioLogin))
+                    {
+                        <ul class="navbar-nav ms-auto align-items-lg-center">
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Home" asp-action="Index" data-i18n="nav-home">Início</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Servicos" asp-action="Index" data-i18n="nav-services">Serviços</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-white"
+                                   asp-controller="Pedidos"
+                                   asp-action="Create"
+                                   data-i18n="nav-request">
+                                    Solicitar Serviços
+                                </a>
+                            </li>
+
+                            @if (usuarioPerfil == "Administrador")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Clientes" asp-action="Index" data-i18n="nav-clients">Clientes</a>
+                                </li>
+                            }
+
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Pedidos" asp-action="Index" data-i18n="nav-orders">
+                                    @(usuarioPerfil == "Administrador" ? "Pedidos" : "Minhas Solicitações")
+                                </a>
+                            </li>
+
+                            <li class="nav-item dropdown ms-lg-2">
+                                <a class="nav-link dropdown-toggle text-warning fw-semibold"
+                                   href="#"
+                                   id="contaDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> @usuarioNome
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="contaDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Configuracoes">
+                                            <i class="bi bi-gear-fill"></i> Configurações
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="https://wa.me/5511999999999?text=Olá,%20gostaria%20de%20suporte%20com%20meu%20pedido." target="_blank">
+                                            <i class="bi bi-whatsapp"></i> Chat de Suporte
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                            <i class="bi bi-box-arrow-right"></i> Sair
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto align-items-lg-center">
+                            <li class="nav-item">
+                                <a class="nav-link text-white me-2" href="https://wa.me/5511999999999" target="_blank">
+                                    <i class="bi bi-question-circle"></i> <span data-i18n="nav-help">Ajuda</span>
+                                </a>
+                            </li>
+                            <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                                <a class="btn btn-outline-light w-100 rounded-pill px-4" asp-controller="Account" asp-action="Login" data-i18n="nav-login">Entrar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-light w-100 rounded-pill px-4 text-primary fw-bold" asp-controller="Account" asp-action="Register" data-i18n="nav-register">Cadastre-se</a>
+                            </li>
+                        </ul>
+                    }
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted bg-white">
+        <div class="container text-center">
+            &copy; 2026 - Lavanderia Clean T-Shirt - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20serviços%20da%20lavanderia." class="whatsapp-float" target="_blank" title="Fale conosco pelo WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            const iconMobile = document.getElementById('themeIconMobile');
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const iconClass = newTheme === 'light' ? 'bi-moon-stars-fill' : 'bi-sun-fill';
+            if(icon) icon.className = `bi ${iconClass}`;
+            if(iconMobile) iconMobile.className = `bi ${iconClass}`;
+        }
+
+        // Dicionário de Traduções
+        const translations = {
+            'pt': {
+                 'nav-home': 'Início',
+                 'nav-services': 'Serviços',
+                 'nav-request': 'Solicitar Serviços',
+                 'nav-clients': 'Clientes',
+                 'nav-orders': 'Pedidos',
+                 'nav-help': 'Ajuda',
+                 'nav-login': 'Entrar',
+                 'nav-register': 'Cadastre-se',
+                 'hero-badge': 'A Melhor Gestão para sua Lavanderia',
+                 'welcome-title': 'Lavanderia Clean T-Shirt',
+                 'welcome-subtitle': 'Simplifique seu negócio com nossa plataforma inteligente. Controle total de pedidos, clientes e serviços em um só lugar.',
+                 'btn-start': 'Começar Agora',
+                 'btn-create-acc': 'Criar Conta Grátis',
+                 'feat-1-title': 'Rapidez e Eficiência',
+                 'feat-1-desc': 'Cadastre pedidos em segundos e acompanhe o status em tempo real.',
+                 'feat-2-title': 'Segurança Total',
+                 'feat-2-desc': 'Seus dados e de seus clientes protegidos com a melhor tecnologia.',
+                 'feat-3-title': 'Visão do Negócio',
+                 'feat-3-desc': 'Relatórios detalhados para você tomar as melhores decisões.',
+                 'stat-clients': 'Clientes',
+                 'stat-orders': 'Pedidos',
+                 'stat-satisfaction': 'Satisfação',
+                 'stat-support': 'Suporte',
+                 'cta-title': 'Pronto para transformar sua lavanderia?',
+                 'cta-desc': 'Junte-se a centenas de empreendedores que já profissionalizaram seu atendimento com a Clean T-Shirt.',
+                 'cta-btn-start': 'Começar Agora Gratuitamente',
+                 'cta-btn-support': 'Falar com Suporte',
+                 'social-title': '🌍 Software com Propósito Social',
+                 'social-desc': 'O Clean T-Shirt não é apenas um sistema de gestão. Nossa plataforma foi desenvolvida para apoiar o empreendedorismo local e reduzir o impacto ambiental através da digitalização de processos, fortalecendo a economia de bairro e promovendo o consumo consciente.'
+             },
+             'en': {
+                 'nav-home': 'Home',
+                 'nav-services': 'Services',
+                 'nav-request': 'Request Service',
+                 'nav-clients': 'Customers',
+                 'nav-orders': 'Orders',
+                 'nav-help': 'Help',
+                 'nav-login': 'Login',
+                 'nav-register': 'Sign Up',
+                 'hero-badge': 'The Best Management for your Laundry',
+                 'welcome-title': 'Clean T-Shirt Laundry',
+                 'welcome-subtitle': 'Simplify your business with our smart platform. Full control of orders, customers, and services in one place.',
+                 'btn-start': 'Get Started',
+                 'btn-create-acc': 'Create Free Account',
+                 'feat-1-title': 'Speed and Efficiency',
+                 'feat-1-desc': 'Register orders in seconds and track status in real-time.',
+                 'feat-2-title': 'Total Security',
+                 'feat-2-desc': 'Your data and your customers protected with the best technology.',
+                 'feat-3-title': 'Business Vision',
+                 'feat-3-desc': 'Detailed reports for you to make the best decisions.',
+                 'stat-clients': 'Customers',
+                 'stat-orders': 'Orders',
+                 'stat-satisfaction': 'Satisfaction',
+                 'stat-support': 'Support',
+                 'cta-title': 'Ready to transform your laundry?',
+                 'cta-desc': 'Join hundreds of entrepreneurs who have already professionalized their service with Clean T-Shirt.',
+                 'cta-btn-start': 'Start Now For Free',
+                 'cta-btn-support': 'Talk to Support',
+                 'social-title': '🌍 Software with Social Purpose',
+                 'social-desc': 'Clean T-Shirt is not just a management system. Our platform was developed to support local entrepreneurship and reduce environmental impact through process digitalization, strengthening the neighborhood economy and promoting conscious consumption.'
+             },
+             'es': {
+                 'nav-home': 'Inicio',
+                 'nav-services': 'Servicios',
+                 'nav-request': 'Solicitar Servicio',
+                 'nav-clients': 'Clientes',
+                 'nav-orders': 'Pedidos',
+                 'nav-help': 'Ayuda',
+                 'nav-login': 'Entrar',
+                 'nav-register': 'Registrarse',
+                 'hero-badge': 'La Mejor Gestión para su Lavandería',
+                 'welcome-title': 'Lavandería Clean T-Shirt',
+                 'welcome-subtitle': 'Simplifique su negocio con nuestra plataforma inteligente. Control total de pedidos, clientes y servicios en un solo lugar.',
+                 'btn-start': 'Empezar Ahora',
+                 'btn-create-acc': 'Crear Cuenta Gratis',
+                 'feat-1-title': 'Rapidez y Eficiencia',
+                 'feat-1-desc': 'Registre pedidos en segundos y siga el estado en tiempo real.',
+                 'feat-2-title': 'Seguridad Total',
+                 'feat-2-desc': 'Sus datos y los de sus clientes protegidos con la mejor tecnología.',
+                 'feat-3-title': 'Visión del Negocio',
+                 'feat-3-desc': 'Informes detallados para que tome las mejores decisiones.',
+                 'stat-clients': 'Clientes',
+                 'stat-orders': 'Pedidos',
+                 'stat-satisfaction': 'Satisfacción',
+                 'stat-support': 'Soporte',
+                 'cta-title': '¿Listo para transformar su lavandería?',
+                 'cta-desc': 'Únase a cientos de emprendedores que ya han profesionalizado su servicio con Clean T-Shirt.',
+                 'cta-btn-start': 'Empezar Ahora Gratis',
+                 'cta-btn-support': 'Hablar con Soporte',
+                 'social-title': '🌍 Software con Propósito Social',
+                 'social-desc': 'Clean T-Shirt no es solo un sistema de gestión. Nuestra plataforma fue desarrollada para apoyar el emprendimiento local y reducir el impacto ambiental a través de la digitalização de procesos, fortaleciendo la economía de barrio y promoviendo el consumo consciente.'
+             }
+        };
+
+        function translatePage(lang) {
+            localStorage.setItem('language', lang);
+            
+            // Atualiza os textos marcados com data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            // Atualiza visualmente os botões
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if(btn.innerText.toLowerCase() === lang) {
+                    btn.classList.add('active');
+                    btn.style.background = 'white';
+                    btn.style.color = 'var(--primary)';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.background = 'rgba(255,255,255,0.1)';
+                    btn.style.color = 'white';
+                }
+            });
+        }
+
+        // Inicializar idioma e tema ao carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('language') || 'pt';
+            translatePage(savedLang);
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            const iconClass = savedTheme === 'light' ? 'bi-moon-stars-fill' : 'bi-sun-fill';
+            const icon = document.getElementById('themeIcon');
+            const iconMobile = document.getElementById('themeIconMobile');
+            if(icon) icon.className = `bi ${iconClass}`;
+            if(iconMobile) iconMobile.className = `bi ${iconClass}`;
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
